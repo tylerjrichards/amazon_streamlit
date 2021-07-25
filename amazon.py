@@ -20,11 +20,12 @@ def load_lottieurl(url: str):
         return None
     return r.json()
 
-lottie_book = load_lottieurl('https://assets1.lottiefiles.com/packages/lf20_WaPNTK.json')
-st_lottie(lottie_book, speed=1, height=200, key="initial")
+lottie_amazon = load_lottieurl('https://assets1.lottiefiles.com/packages/lf20_WaPNTK.json')
+st_lottie(lottie_amazon, speed=1, height=200, key="initial")
 
 
 matplotlib.use("agg")
+matplotlib.rcParams.update({'font.size': 14})
 
 _lock = RendererAgg.lock
 
@@ -60,7 +61,6 @@ if file_name is not None:
 	df = pd.read_csv(file_name)
 else:
 	st.stop()
-#df = pd.read_csv('amazon_history.csv')
 
 #data cleaning
 df['Order Date'] = pd.to_datetime(df['Order Date'])
@@ -73,7 +73,7 @@ df['Order Month Digit'] = df['Order Date'].dt.month
 #spend per year
 df_orders_year = pd.DataFrame(df.groupby('Order Year').sum()['Item Total']).reset_index()
 
-fig_spend_per_year = Figure()
+fig_spend_per_year = Figure(figsize=(8,7), dpi=900)
 ax_spend_per_year = fig_spend_per_year.subplots()
 sns.barplot(data=df_orders_year, 
 	x='Order Year', y='Item Total', 
@@ -93,7 +93,7 @@ df_copy.set_index('Order Date', inplace=True)
 df_month_date = pd.DataFrame(df_copy.resample('1M').count()['Order ID']).reset_index()
 df_month_date.columns = ['date', 'count']
 
-fig_orders_over_time = Figure()
+fig_orders_over_time = Figure(figsize=(8,7), dpi=900)
 ax_orders_over_time = fig_orders_over_time.subplots()
 sns.lineplot(data = df_month_date, x='date', 
 	y='count', palette='viridis', ax=ax_orders_over_time)
@@ -106,19 +106,20 @@ ax_orders_over_time.set_title('Amazon Purchases Over Time')
 df_month = df.groupby(['Order Month', 'Order Month Digit']).count()['Order Date'].reset_index()
 df_month.columns = ['Month', 'Month_digit', 'Order_count']
 df_month.sort_values(by='Month_digit', inplace=True)
-fig_month = Figure()
+fig_month = Figure(figsize=(8,7), dpi=900)
 ax_month = fig_month.subplots()
 sns.barplot(data = df_month, palette='viridis', 
 	x = 'Month', y = 'Order_count', ax=ax_month)
 ax_month.set_xticklabels(df_month['Month'], rotation=45)
 ax_month.set_title('Amazon Shopping: Month Trend')
 ax_month.set_ylabel('Purchase Count')
-#st.pyplot(fig_month)
+max_month_val = list(df_month.sort_values(by='Order_count', ascending=False).head(1)['Order_count'])[0]
+max_month = list(df_month[df_month['Order_count'] == max_month_val]['Month'])[0]
 
 #orders per city
 df_cities = pd.DataFrame(df['Shipping Address City'].str.upper().value_counts()).reset_index()
 df_cities.columns = ['City', 'Order Count']
-fig_cities = Figure()
+fig_cities = Figure(figsize=(8,7), dpi=900)
 ax_cities = fig_cities.subplots()
 sns.barplot(data = df_cities, palette='viridis', x='City', y='Order Count', ax=ax_cities)
 ax_cities.set_xticklabels(df_cities['City'], rotation=45)
@@ -130,13 +131,14 @@ df_cat = df.groupby(['Category']).count()['Order Date'].reset_index()
 df_cat.columns = ['Category', 'Purchase Count']
 df_cat.sort_values(by='Purchase Count', ascending=False, inplace=True)
 df_cat = df_cat.head(15)
-fig_cat = Figure()
+fig_cat = Figure(figsize=(8,7), dpi=900)
 ax_cat = fig_cat.subplots()
 sns.barplot(data = df_cat, palette='viridis', 
 	x = 'Category', y = 'Purchase Count', ax=ax_cat)
 ax_cat.set_xticklabels(df_cat['Category'], rotation=45, fontsize=8)
 ax_cat.set_title('Top 15 Purchase Categories')
 ax_cat.set_ylabel('Purchase Count')
+pop_cat = list(df_cat.head(1)['Category'])[0]
 
 #month prediction, moving average
 data = list(df_month_date['count'])
@@ -146,25 +148,34 @@ model_fit = model.fit()
 # make prediction
 yhat = np.round(model_fit.predict(len(data), len(data))[0])
 
+st.write('## **Amazon Purchasing Over Time**')
+st.write('-------------------')
 col1, col2 = st.beta_columns(2)
 
 with col1:
 	st.pyplot(fig_spend_per_year)
-	st.write('Looks like your biggest spending year was {} when you spent ${} on Amazon.'.format(max_year, round(max_val)))
+	st.write('This graph showed me that I have depended more and more on Amazon for commerce over time, and especially when there were too many COVID cases in the US to go shopping. Looks like your biggest spending year was {} when you spent ${} on Amazon.'.format(max_year, round(max_val)))
 
 with col2:
 	st.pyplot(fig_orders_over_time)
-	st.write('Using a simple moving average model, we predict that next month you will buy {} items.'.format(yhat))
+	st.write('For me, this graph was useful because I could see two big upticks, once when I graduated high school and moved in for college and the second when I got my first internships and could actually buy more. I also made a simple moving average model on your data, and predict that next month you will buy {} items.'.format(yhat))
 
-col3, col4 = st.beta_columns(2)
+st.write('## **More Item Specific Analysis**')
+st.write('-------------------')
+col3, col4, col5 = st.beta_columns(3)
 
 with col3:
 	st.pyplot(fig_month)
+	st.write('Over time, you have bought the most items in {}, a total of {} items. My biggest Amazon month was January, but only because I moved during two Januaries!'.format(max_month, max_month_val))
 
 with col4:
 	st.pyplot(fig_cities)
+	st.write('I love this graph because it so clearly showed me where I have moved over time!')
 
-
-col5, col6 = st.beta_columns(2)
+#col5, col6 = st.beta_columns(2)
 with col5:
 	st.pyplot(fig_cat)
+	st.write("My biggest category here by far was books, I've bought 3x more books than any other category! Your most popular category was {}".format(pop_cat))
+
+st.write('## **RocketShip**')
+st.write('-------------------')
