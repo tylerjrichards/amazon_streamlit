@@ -19,8 +19,9 @@ def load_lottieurl(url: str):
     if r.status_code != 200:
         return None
     return r.json()
-
-lottie_amazon = load_lottieurl('https://assets1.lottiefiles.com/packages/lf20_WaPNTK.json')
+#https://assets6.lottiefiles.com/private_files/lf30_zERHJg.json
+#https://assets1.lottiefiles.com/packages/lf20_WaPNTK.json
+lottie_amazon = load_lottieurl('https://assets6.lottiefiles.com/private_files/lf30_zERHJg.json')
 st_lottie(lottie_amazon, speed=1, height=200, key="initial")
 
 
@@ -49,7 +50,11 @@ with row1_1:
 	insane amount on Amazon every year, but I didn't have a great idea about what
 	exactly I was spending it on. I tried a few methods, like [different budgeting apps](https://copilot.money/)
 	and [Amazon's puchase history page](https://www.amazon.com/gp/your-account/order-history)
-	, but none of them gave me enough detail.    
+	, but none of them gave me enough detail.  
+	In addition to that, Jeff Bezos has put $19 billion of his fortune into going into space and making space flight cheaper 
+	with Blue Origin, and after doing so, 
+	said "I want to thank every Amazon employee and every Amazon customer because you guys paid for all of this". So
+	how much of this did I actually pay for?  
 	This app analyzes your Amazon purchase habits over time, the items you've bought, 
 	how much you've spent, and where this is trending over time. Have fun!
 	**To begin, please download [Amazon order history](https://www.amazon.com/gp/b2b/reports). 
@@ -177,5 +182,18 @@ with col5:
 	st.pyplot(fig_cat)
 	st.write("My biggest category here by far was books, I've bought 3x more books than any other category! Your most popular category was {}".format(pop_cat))
 
-st.write('## **RocketShip**')
+st.write('### **Amazon Smile**')
 st.write('-------------------')
+'''
+My good friend [Elle](https://twitter.com/ellebeecher) reminded me the other 
+day that Amazon has this great program called 
+[Amazon Smile](https://t.co/F2XATkkBDF?amp=1), where they'll donate .5% 
+of each purchase to the charity of your choice. If you haven't done that 
+already, give it a shot!
+'''
+total = round(df_copy['Item Total'].sum() * .5 * .01, 2)
+st.write('Since as far back as your data goes, you would have donated a total of ${} to charity at no cost to you, so what are you waiting for?'.format(total))
+
+st.write('-------------------')
+
+st.write('Thank you for walking through this Amazon analysis with me! If you like budget apps, my personal favorite is [Copilot](https://copilot.money/link/uZ9ZRvAaRXQCqgwE7)')
