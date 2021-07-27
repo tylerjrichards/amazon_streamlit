@@ -62,7 +62,7 @@ with row1_1:
 
 	**To begin, please download [Amazon order history](https://www.amazon.com/gp/b2b/reports). This app works best on desktop, and 
 	also works best with multiple years of Amazon history, so please select a few years of data to download from Amazon! The
-	 report should take a few minutes to be ready from Amazon, so be patient. When it downloads, upload it to this app below.  
+	 report should take a few minutes to be ready from Amazon, so be patient and if it looks slow, try clicking the 'Refresh List' button. When it downloads, upload it to this app below.  
 	This app neither records nor stores your data, ever.**
 	'''
 	file_name = st.file_uploader('Upload Your Amazon Data Here')
