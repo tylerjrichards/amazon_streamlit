@@ -51,13 +51,18 @@ with row1_1:
 	exactly I was spending it on. I tried a few methods, like [different budgeting apps](https://copilot.money/)
 	and [Amazon's puchase history page](https://www.amazon.com/gp/your-account/order-history)
 	, but none of them gave me enough detail.  
+
 	In addition to that, Jeff Bezos has put $19 billion of his fortune into going into space and making space flight cheaper 
 	with Blue Origin, and after doing so, 
 	said "I want to thank every Amazon employee and every Amazon customer because you guys paid for all of this". So
-	how much of this did I actually pay for?  
+	how much of this did I actually pay for? An insignificant amount to Jeff, but significant to me, surely.    
+
 	This app analyzes your Amazon purchase habits over time, the items you've bought, 
-	how much you've spent, and where this is trending over time. Have fun!
-	**To begin, please download [Amazon order history](https://www.amazon.com/gp/b2b/reports). 
+	how much you've spent, and where this is trending over time. Have fun!  
+
+	**To begin, please download [Amazon order history](https://www.amazon.com/gp/b2b/reports). This app works best on desktop, and 
+	also works best with multiple years of Amazon history, so please select a few years of data to download from Amazon! The
+	 report should take a few minutes to be ready from Amazon, so be patient. When it downloads, upload it to this app below.  
 	This app neither records nor stores your data, ever.**
 	'''
 	file_name = st.file_uploader('Upload Your Amazon Data Here')
@@ -116,7 +121,7 @@ ax_month = fig_month.subplots()
 sns.barplot(data = df_month, palette='viridis', 
 	x = 'Month', y = 'Order_count', ax=ax_month)
 ax_month.set_xticklabels(df_month['Month'], rotation=45)
-ax_month.set_title('Amazon Shopping: Month Trend')
+ax_month.set_title('Amazon Shopping: Monthly Trend')
 ax_month.set_ylabel('Purchase Count')
 max_month_val = list(df_month.sort_values(by='Order_count', ascending=False).head(1)['Order_count'])[0]
 max_month = list(df_month[df_month['Order_count'] == max_month_val]['Month'])[0]
@@ -124,11 +129,13 @@ max_month = list(df_month[df_month['Order_count'] == max_month_val]['Month'])[0]
 #orders per city
 df_cities = pd.DataFrame(df['Shipping Address City'].str.upper().value_counts()).reset_index()
 df_cities.columns = ['City', 'Order Count']
+df_cities.sort_values(by='Order Count', inplace=True)
+df_cities = df_cities.head(15)
 fig_cities = Figure(figsize=(8,7), dpi=900)
 ax_cities = fig_cities.subplots()
 sns.barplot(data = df_cities, palette='viridis', x='City', y='Order Count', ax=ax_cities)
 ax_cities.set_xticklabels(df_cities['City'], rotation=45)
-ax_cities.set_title('Where Have Your Amazon Packages Gone?')
+ax_cities.set_title('Where Have Your Amazon Packages Gone? Top 15 Cities')
 
 
 #order categories
@@ -163,7 +170,7 @@ with col1:
 
 with col2:
 	st.pyplot(fig_orders_over_time)
-	st.write('For me, this graph was useful because I could see two big upticks, once when I graduated high school and moved in for college and the second when I got my first internships and could actually buy more. I also made a simple moving average model on your data, and predict that next month you will buy {} items.'.format(yhat))
+	st.write('For me, this graph was useful because I could see two big upticks, once when I graduated high school and moved in for college and the second when I got my first internship and could actually afford to shop more. I also made a simple moving average model on your data, and predict that next month you will buy {} items.'.format(yhat))
 
 st.write('## **More Item Specific Analysis**')
 st.write('-------------------')
@@ -196,4 +203,4 @@ st.write('Since as far back as your data goes, you would have donated a total of
 
 st.write('-------------------')
 
-st.write('Thank you for walking through this Amazon analysis with me! If you like budget apps, my personal favorite is [Copilot](https://copilot.money/link/uZ9ZRvAaRXQCqgwE7)')
+st.write('Thank you for walking through this Amazon analysis with me! If you liked this, follow me on [Twitter](https//www.twitter.com/tylerjrichards) or take a look at my [new book on Streamlit apps](https://www.amazon.com/Getting-Started-Streamlit-Data-Science-ebook/dp/B095Z1R3BP). If you like budget apps, my personal favorite is [Copilot](https://copilot.money/link/uZ9ZRvAaRXQCqgwE7), check it out and get a free month.')
